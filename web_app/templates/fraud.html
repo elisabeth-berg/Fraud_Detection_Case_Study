@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Find the Fraudiest Events!</title>
+  <meta name="description" content="Predicts fraud">
+  <meta name="author" content="Team Strigiformes">
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <style>
+  table, th, td {border: 1px solid black;
+                 }
+  table, th, td {padding: 15px;}
+  </style>
+
+</head>
+
+<h1>
+&emsp;Investigation Priorities
+</h1>
+
+
+<table>
+  <th>Event ID</th>
+  <th>Fraud</th>
+  <th>Spam</th>
+  <th>TOS</th>
+  <th>Priority</th>
+{% for row in event_data %}
+    <tr>
+      <td>{{row.event_id}}</td>
+      <td>{{row.fraud}}</td>
+      <td>{{row.spam}}</td>
+      <td>{{row.tos}}</td>
+      <td>{{row.largest}}</td>
+    </tr>
+
+  {% endfor %}
+</table>
+
+
+</html>
