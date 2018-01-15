@@ -91,6 +91,7 @@ class FraudModel(object):
 
 def get_data(datafile):
     df = pd.read_json(datafile)
+    X = clean_data(df)
     # clean X data
     y = _get_labels(df)
     return X, y
