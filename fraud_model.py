@@ -5,6 +5,8 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import pickle
+from nlp import *
+from data_cleanup import *
 
 class FraudModel(object):
     def __init__(self, alpha=0.1, n_jobs=-1, max_features='sqrt', n_estimators=1000):
@@ -59,6 +61,9 @@ class FraudModel(object):
         """
         desc_no_html = run_nlp(X)
         word_counts = self.tfidf.transform(desc_no_html)
+        X_cluster = compute_cluster_distance(word_counts, self.cluster_centers)
+
+        RF_X = X.merge(X_cluster)
 
         RFC_preds = self.RFC.predict_proba(X)
 
@@ -94,7 +99,6 @@ def _get_labels(df):
     acc_type_dict = {'fraudster': 'fraud',
                  'fraudster_att': 'fraud',
                  'fraudster_event': 'fraud',
-                 'locked': 'locked',
                  'premium': 'premium',
                  'spammer': 'spam',
                  'spammer_limited': 'spam',
@@ -102,7 +106,8 @@ def _get_labels(df):
                  'spammer_warn': 'spam',
                  'spammer_web': 'spam',
                  'tos_lock': 'tos',
-                 'tos_warn': 'tos'}
+                 'tos_warn': 'tos',
+                 'locked': 'tos'}
 
     df['acct_label'] = df['acct_type'].map(acc_type_dict)
     return df['acct_label']
