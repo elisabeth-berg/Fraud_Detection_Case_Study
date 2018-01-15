@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
+import pickle
 
 class FraudModel(object):
     def __init__(self, alpha=0.1, n_jobs=-1, max_features='sqrt', n_estimators=1000):
@@ -61,3 +62,35 @@ class FraudModel(object):
         - weighted_arr: weighted "importance" of probabilities
         """
         pass
+
+
+def get_data(datafile):
+    df = pd.read_json(datafile)
+    # clean X data
+    y = _get_labels(df)
+    return X, y
+
+def _get_labels(df):
+    acc_type_dict = {'fraudster': 'fraud',
+                 'fraudster_att': 'fraud',
+                 'fraudster_event': 'fraud',
+                 'locked': 'locked',
+                 'premium': 'premium',
+                 'spammer': 'spam',
+                 'spammer_limited': 'spam',
+                 'spammer_noinvite': 'spam',
+                 'spammer_warn': 'spam',
+                 'spammer_web': 'spam',
+                 'tos_lock': 'tos',
+                 'tos_warn': 'tos'}
+
+    df['acct_label'] = df['acct_type'].map(acc_type_dict)
+    return df['acct_label']
+
+if __name__ == '__main__':
+    train_X, train_y = get_data('data/train_data.json')
+    fraud_model = FraudModel()
+    fraud_model.fit(train_X, train_y)
+    with open('fraud_model.pkl', 'w') as f:
+        # Write the model to a file.
+        pickle.dump(fraud_model, f)
