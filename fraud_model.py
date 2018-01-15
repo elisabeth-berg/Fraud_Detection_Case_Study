@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
 import pickle
 
 class FraudModel(object):
@@ -27,10 +29,25 @@ class FraudModel(object):
         - X: dataframe representing feature matrix for training data
         - y: series representing labels for training data
         """
-        # Random Forest
-        self.RFC.fit(X, y)
-
         # NLP
+        desc_no_html = run_nlp(X)
+        self.tfidf = TfidfVectorizer(stop_words='english', max_features=1000)
+        word_counts = self.tfidf.fit_transform(desc_no_html)
+
+        # K-means
+        desc_kmeans = KMeans(n_clusters=5, random_state=56, n_jobs=-1)
+        desc_kmeans.fit(word_counts)
+        self.cluster_centers = desc_kmeans.cluster_centers_
+        X_cluster = compute_cluster_distance(word_counts, self.cluster_centers)
+
+        RF_X = X.merge(X_cluster)
+
+        # Random Forest
+        self.RFC.fit(RF_X, y)
+
+        # Naive Bayes
+        self.MNB.fit(word_counts, y)
+
 
     def predict_proba(self, X):
         """
@@ -40,6 +57,9 @@ class FraudModel(object):
         OUTPUT:
         - blah
         """
+        desc_no_html = run_nlp(X)
+        word_counts = self.tfidf.transform(desc_no_html)
+
         RFC_preds = self.RFC.predict_proba(X)
 
     def score(self, X, y):
