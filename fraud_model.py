@@ -4,9 +4,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
+from mlxtend.classifier import StackingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
 import pickle
 from nlp import *
 from data_cleanup import *
+
 
 class FraudModel(object):
     def __init__(self, alpha=0.1, n_jobs=-1, max_features='sqrt', n_estimators=1000):
@@ -24,6 +28,10 @@ class FraudModel(object):
         self.RFC = RandomForestClassifier(n_jobs=n_jobs, max_features=max_features,
                                             n_estimators=n_estimators)
         self.MNB = MultinomialNB(alpha=alpha)
+        self.lr = LogisticRegression()
+        self.STK = StackingClassifier(classifiers=[self.RFC, self.MNB,
+                          meta_classifier=lr)
+
 
     def fit(self, X, y):
         """
@@ -49,6 +57,16 @@ class FraudModel(object):
 
         # Naive Bayes
         self.MNB.fit(word_counts, y)
+
+        # Stacked Classifier
+        RFCpipeline = make_pipeline(RF_X,
+                      self.RFC)
+
+        MNBpipeline = make_pipeline(word_counts,
+                      self.MNB)
+
+        self.STK.fit(classifiers=[RFCpipeline, MNBpipeline], y)
+
 
 
     def predict_proba(self, X):
