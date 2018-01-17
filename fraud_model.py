@@ -70,8 +70,6 @@ class FraudModel(object):
 
         self.STK.fit(classifiers=[RFCpipeline, MNBpipeline], y)
 
-
-
     def predict_proba(self, X):
         """
         INPUT:
@@ -90,6 +88,10 @@ class FraudModel(object):
 
         STK_preds = self.STK.predict_proba(X)
 
+        self.log_loss_ =
+
+    def _log_loss(self, y_true, ):
+        pass
 
 def get_data(datafile):
     df = pd.read_json(datafile)
