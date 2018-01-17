@@ -11,9 +11,17 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    # get the data from mongod
-    # [{user_id: ..., prediced_prob: ..., ...}]
-    data_from_mongo = events.find().sort("largest", -1).limit(10)
+    # get the data from mongodb
+    # columns are ['event_id', 'fraud', 'tos', 'spam', 'largest']
+    data_from_mongo = list(events.find().sort("largest", -1).limit(10))
+    results = []
+    for row in data_from_mongo:
+        if row["fraud"] == row["largest"]:
+            row["class"] = "danger"
+        elif row["tos"] == row["largest"]:
+            row["class"] = "warning"
+        elif row["spam"] == row["largest"]:
+            row["class"] = "info"
     return render_template('fraud.html', event_data=data_from_mongo)
 
 
