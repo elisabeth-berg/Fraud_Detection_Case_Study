@@ -90,27 +90,6 @@ class FraudModel(object):
 
         STK_preds = self.STK.predict_proba(X)
 
-    def score(self, X, y):
-        """
-        INPUT:
-        - X: dataframe representing feature matrix for testing data
-        - y: series representing labels for testing data
-
-        OUTPUT:
-        - blah
-        """
-        self.predict_proba(X)
-
-    def _weighted_probas(self, arr):
-        """
-        INPUT:
-        - arr: np array of probabilities of classes
-
-        OUTPUT:
-        - weighted_arr: weighted "importance" of probabilities
-        """
-
-
 
 def get_data(datafile):
     df = pd.read_json(datafile)
