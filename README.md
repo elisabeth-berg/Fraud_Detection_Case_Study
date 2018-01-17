@@ -24,10 +24,10 @@ File stuff goes here
 
 ## Team Members
 
-* **Christiana Smith** - [cjsmith015](https://github.com/PurpleBooth)
-* **William Henderson-Drager** - github
-* **Liz Berg** - github
-* **Benjamin Walzer** - github
+* **Christiana Smith** - [cjsmith015](https://github.com/cjsmith015)
+* **William Henderson-Drager** - [willhd](https://github.com/willhd)
+* **Liz Berg** - [elisabeth-berg](https://github.com/elisabeth-berg)
+* **Benjamin Walzer** - [bwalzer](https://github.com/bwalzer)
 
 ## Acknowledgments
 
