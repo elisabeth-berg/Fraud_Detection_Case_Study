@@ -28,35 +28,38 @@ class FraudModel(object):
         self.RFC = RandomForestClassifier(n_jobs=n_jobs, max_features=max_features,
                                             n_estimators=n_estimators)
         self.MNB = MultinomialNB(alpha=alpha)
-        self.lr = LogisticRegression()
-        self.STK = StackingClassifier(classifiers=[self.RFC, self.MNB,
-                          meta_classifier=lr)
+        self.LogR = LogisticRegression()
+        self.STK = StackingClassifier(classifiers=[self.RFC, self.MNB, meta_classifier=self.LogR, use_probas=True)
 
 
-    def fit(self, X, y):
+    def fit(self, X, y, KMeans=True, NaiveBayes=True):
         """
         INPUT:
         - X: dataframe representing feature matrix for training data
         - y: series representing labels for training data
         """
+
         # NLP
         desc_no_html = run_nlp(X)
         self.tfidf = TfidfVectorizer(stop_words='english', max_features=1000)
         word_counts = self.tfidf.fit_transform(desc_no_html)
 
-        # K-means
-        desc_kmeans = KMeans(n_clusters=5, random_state=56, n_jobs=-1)
-        desc_kmeans.fit(word_counts)
-        self.cluster_centers = desc_kmeans.cluster_centers_
-        X_cluster = compute_cluster_distance(word_counts, self.cluster_centers)
+        if KMeans == true:
+            # K-means
+            desc_kmeans = KMeans(n_clusters=5, random_state=56, n_jobs=-1)
+            desc_kmeans.fit(word_counts)
+            self.cluster_centers = desc_kmeans.cluster_centers_
+            X_cluster = compute_cluster_distance(word_counts, self.cluster_centers)
 
-        RF_X = X.merge(X_cluster)
+            RF_X = X.merge(X_cluster)
+        else:
+            RF_X = X
 
         # Random Forest
         self.RFC.fit(RF_X, y)
-
-        # Naive Bayes
-        self.MNB.fit(word_counts, y)
+        if NaiveBayes == True:
+            # Naive Bayes
+            self.MNB.fit(word_counts, y)
 
         # Stacked Classifier
         RFCpipeline = make_pipeline(RF_X,
@@ -85,6 +88,8 @@ class FraudModel(object):
 
         RFC_preds = self.RFC.predict_proba(X)
 
+        STK_preds = self.STK.predict_proba(X)
+
     def score(self, X, y):
         """
         INPUT:
@@ -104,7 +109,7 @@ class FraudModel(object):
         OUTPUT:
         - weighted_arr: weighted "importance" of probabilities
         """
-        pass
+
 
 
 def get_data(datafile):
